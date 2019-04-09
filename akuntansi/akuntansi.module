@@ -1,0 +1,304 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_perm().
+ */
+//onModuleCreationWizard
+function akuntansi_perm() {
+    return array(
+        'access akuntansi content',
+		'access laporan akuntansi'
+	);
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+
+function akuntansi_menu() {
+
+
+	$items['akuntansi'] = array (
+      'title' => 'Anggaran Akuntansi',
+	  'description' => 'Anggaran Akuntansi',
+	  'title callback' => 'akuntansi_title_callback',	  
+      'page callback' => 'akuntansi_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'akuntansi_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['akuntansi/edit'] = array (
+      'title' => 'Anggaran akuntansi usahaan SKPD',
+	  'description' => 'Anggaran akuntansi usahaan',
+	  'title callback' => 'akuntansi_title_callback',	  
+      'page callback' => 'akuntansi_edit_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'akuntansi_edit_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['akuntansi/buku'] = array (
+      'title' => 'Buku Besar Kegiatan',
+	  'description' => 'Buku Besar Kegiatan',
+	  'title callback' => 'akuntansi_title_callback',	  
+      'page callback' => 'akuntansi_buku_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'akuntansi_buku_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+	$items['akuntansi/kud'] = array (
+      'title' => 'Buku Kas Umum Daerah',
+	  'description' => 'Buku Kas Umum Daerah',
+	  'title callback' => 'akuntansi_title_callback',	  
+      'page callback' => 'akuntansi_kud_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'akuntansi_kud_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+	$items['akuntansi/bukubelanjaselector'] = array (
+      'title' => 'Buku Besar Kegiatan',
+	  'description' => 'Buku Besar Kegiatan',
+      'page callback' => 'akuntansi_bukubelanja_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'akuntansi_bukubelanja_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['akuntansi/bukurekbelanjaselector'] = array (
+      'title' => 'Buku Besar Rekening Belanja',
+	  'description' => 'Buku Besar Rekening Belanja',
+      'page callback' => 'akuntansi_bukurekbelanja_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'akuntansi_bukurekbelanja_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+	$items['akuntansi/bukurekpendapatanselector'] = array (
+      'title' => 'Buku Besar Rekening Pendapatan',
+	  'description' => 'Buku Besar Rekening Pendapatan',
+      'page callback' => 'akuntansi_bukurekpendapatan_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'akuntansi_bukurekpendapatan_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+	$items['akuntansi/bukureksapselector'] = array (
+      'title' => 'Buku Besar Rekening SAP',
+	  'description' => 'Buku Besar Rekening SAP',
+      'page callback' => 'akuntansi_bukureksap_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'akuntansi_bukureksap_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['akuntansi/bukusap'] = array (
+      'title' => 'Buku Besar SAP',
+	  'description' => 'Buku Besar SAP',
+	  'title callback' => 'akuntansi_title_callback',	  
+      'page callback' => 'akuntansi_bukusap_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'akuntansi_bukusap_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+    return $items;
+}
+
+
+function akuntansi_title_callback() {
+    return t('Anggaran Akuntansi');
+}
+
+ 
+function akuntansi_cron() {
+
+}
+
+
+function akuntansi_block_info() {
+  // Many options are defined in hook_block_info():
+  $blocks['chart_buku_besar'] = array(
+    // info: The name of the block.
+    'info' => t('Chart Buku Besar'),
+    // Block caching options (per role, per user, etc.)
+    // DRUPAL_CACHE_PER_ROLE is the default.
+    'cache' => DRUPAL_CACHE_PER_ROLE,
+  );
+
+  /*
+  // This sample shows how to provide default settings. In this case we'll
+  // enable the block in the first sidebar and make it visible only on
+  // 'node/*' pages. See the hook_block_info() documentation for these.
+  $blocks['example_empty'] = array(
+    'info' => t('Example: empty block'),
+    'status' => TRUE,
+    'region' => 'sidebar_first',
+    'visibility' => BLOCK_VISIBILITY_LISTED,
+    'pages' => 'node/*',
+  );
+  */
+
+  return $blocks;
+}
+
+function akuntansi_block_view($delta = '') {
+  // The $delta parameter tells us which block is being requested.
+  switch ($delta) {
+    case 'chart_buku_besar':
+      // The subject is displayed at the top of the block. Note that it
+      // should be passed through t() for translation. The title configured
+      // for the block using Drupal UI supercedes this one.
+      $block['subject'] = t('Chart Buku Besar');
+      // The content of the block is typically generated by calling a custom
+      // function.
+      $block['content'] = block_akuntansi_contents($delta);
+      break;
+
+    case 'example_empty':
+      $block['subject'] = t('Title of second block (example_empty)');
+      $block['content'] = block_akuntansi_contents($delta);
+      break;
+
+  }
+  return $block;
+}
+
+function block_akuntansi_contents($which_block) {
+  switch ($which_block) {
+    case 'chart_buku_besar':
+      // Modules would typically perform some database queries to fetch the
+      // content for their blocks. Here, we'll just use the variable set in the
+      // block configuration or, if none has set, a default value.
+      // Block content can be returned in two formats: renderable arrays
+      // (as here) are preferred though a simple string will work as well.
+      // Block content created through the UI defaults to a string.
+      $result = array(
+        '#markup' => draw_chart_buku_besar(),
+      );
+      return $result;
+
+    case 'example_empty':
+      // It is possible that a block not have any content, since it is
+      // probably dynamically constructed. In this case, Drupal will not display
+      // the block at all. This block will not be displayed.
+      return;
+  }
+} 
+
+function draw_chart_buku_besar_caller($tahun, $kodeuk, $kodekeg, $kodero) {
+	$tahun = arg(2);
+
+	$kodekeg = arg(3);
+	$kodero = arg(4);
+	$kodeuk = arg(5);
+	
+	return draw_chart_buku_besar($tahun, $kodeuk, $kodekeg, $kodero);
+
+}
+function draw_chart_buku_besar($tahun, $kodeuk, $kodekeg, $kodero) {
+
+//$tahun = 2015;		//arg(2);
+//$kodekeg = '{1236B31F-3D17-4878-81E3-F4027F67E355}';		//arg(3);
+/*
+$tahun = arg(2);
+
+$kodekeg = arg(3);
+$kodero = arg(4);
+$kodeuk = arg(5);
+*/
+
+$arr_bulanan = array();
+$arr_kumulatif = array();
+ 
+
+$i = 0;
+$kum = 0;
+for ($bulan=1; $bulan<=12; $bulan++){
+	//$arr_bulan[$i] = $bulan;
+	
+	$debetkredit = 0;
+	$kreditdebet = 0;
+	$value = 0;
+	
+	$query = db_select('jurnalitem' . $tahun, 'ji');
+	$query->innerJoin('jurnal' . $tahun, 'j', 'ji.jurnalid=j.jurnalid');
+	$query->innerJoin('unitkerja' . $tahun, 'u', 'j.kodeuk=u.kodeuk');
+	$query->leftJoin('kegiatan' . $tahun, 'k', 'j.kodekeg=k.kodekeg');
+	
+	$query->addExpression('SUM((ji.debet-ji.kredit)/1000)', 'debetkredit');
+	$query->addExpression('SUM((ji.kredit-ji.debet)/1000)', 'kreditdebet');
+	
+	if ($kodeuk !='ZZ') $query->condition('j.kodeuk', $kodeuk, '=');
+	if ($kodekeg !='ZZ') $query->condition('j.kodekeg', $kodekeg, '=');
+	$query->condition('ji.kodero', $kodero, '=');
+	//MONTH
+	$query->where('EXTRACT(MONTH FROM j.tanggal) = :month', array('month' => $bulan));
+	
+	$results = $query->execute();
+	
+	//Values
+	foreach ($results as $data) {
+		$debetkredit = (real) $data->debetkredit;
+		$kreditdebet = (real) $data->kreditdebet;
+		
+		if ($kreditdebet>0)
+			$value = $kreditdebet;
+		else
+			$value = $debetkredit;
+		
+		$kum = $kum + $value;
+		
+		$arr_bulanan[$i]= array((int)$bulan, (real)$value);
+		$arr_kumulatif[$i] = array((int)$bulan, (real)$kum);;
+	}
+	
+	$i++;
+}
+
+
+$chart = array(
+    '#type' => 'chart',
+    '#chart_type' => 'line',
+    '#chart_library' => 'highcharts', // Allowed values: 'google' or 'highcharts'
+    '#title' => t('Chart Buku Besar'),
+    '#legend_position' => 'right',
+    '#data_labels' => TRUE,
+    '#tooltips' => TRUE,	
+  );
+  $chart['bulanan'] = array(
+    '#type' => 'chart_data',
+    '#title' => t('Bulanan'),
+    '#data' => $arr_bulanan,
+	
+  );
+  $chart['kumulatif'] = array(
+    '#type' => 'chart_data',
+    '#title' => t('Kumulatif'),
+    '#data' => $arr_kumulatif,
+	
+  );
+
+  $chart['chart_buku_besar'] = $chart;
+
+  return drupal_render($chart);
+
+}
+ 
+

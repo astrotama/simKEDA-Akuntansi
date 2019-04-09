@@ -1,0 +1,33 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_perm().
+ */
+//onModuleCreationWizard
+function baru_perm() {
+    return array(
+        'access baru content',
+		'access laporan baru'
+	);
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+
+function baru_menu() {
+	
+	$items['baru'] = array (
+      'title' => 'Baru',
+	  'description' => 'Baru',
+      'page callback' => 'baru_main',
+      //'access arguments' => array ('akses pendataan'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'baru_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+	    return $items;
+}

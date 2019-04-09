@@ -1,0 +1,194 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_perm().
+ */
+//onModuleCreationWizard
+function bukubesar_perm() {
+    return array(
+        'access bukubesar content',
+		'access laporan bukubesar'
+	);
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+
+function bukubesar_menu() {
+
+
+	$items['bukubesar'] = array (
+      'title' => 'Anggaran bukubesar',
+	  'description' => 'Anggaran bukubesar',
+	  'title callback' => 'bukubesar_title_callback',	  
+      'page callback' => 'bukubesar_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'bukubesar_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+	
+
+
+    return $items;
+}
+
+function _ajax_skpd_options() {
+  // drupal_map_assoc() just makes an array('String' => 'String'...).
+	$pquery = 'select * from {unitkerja}';
+	
+	$pres = db_query($pquery);
+	
+	
+	$option[] = "- Pilih Nama SKPD - ";
+	foreach ($pres as $prow) {
+		//$option[]= $prow->kodeu . ' - ' . $prow->urusansingkat;
+		$option[]= $prow->namasingkat;
+		//drupal_set_message($pquery);
+	}
+  $opt=array(
+		  t('String'),
+		  t('Woodwind'),
+		  t('Brass'),
+		  t('Percussion'),
+	  );
+  
+  return drupal_map_assoc(
+    $option
+  );
+}
+function _ajax_kegiatan_options($key = '') {
+	$options2=array();
+	$pquery = 'SELECT k.kodekeg,k.kegiatan,u.namasingkat FROM `kegiatan` as k inner join unitkerja as u on k.kodeuk=u.kodeuk';
+	
+	$pres = db_query($pquery);
+	
+	//$kodej=null;
+	$option[] = "- Pilih Jenis Rekening - ";
+	foreach ($pres as $prow) {
+		/*$option[]= $prow->urusansingkat;
+		$kodej=$prow->kodeu;
+		$oquery = 'select * from obyek where kodej='.$kodej;
+		$ores = db_query($oquery);*/
+		//foreach ($ores as $row) {
+			$options2[$prow->namasingkat][$prow->kodekeg.'||'.$prow->kegiatan]=$prow->kodekeg.'||'.$prow->kegiatan;
+		//}
+		//drupal_set_message($options2);
+	}
+	
+	
+  $options = array(
+    t('String') => drupal_map_assoc(
+      array(
+        t('Violin'),
+        t('Viola'),
+        t('Cello'),
+        t('Double Bass'),
+      )
+    ),
+    t('Woodwind') => drupal_map_assoc(
+      array(
+        t('Flute'),
+        t('Clarinet'),
+        t('Oboe'),
+        t('Bassoon'),
+      )
+    ),
+    t('Brass') => drupal_map_assoc(
+      array(
+        t('Trumpet'),
+        t('Trombone'),
+        t('French Horn'),
+        t('Euphonium'),
+      )
+    ),
+    t('Percussion') => drupal_map_assoc(
+      array(
+        t('Bass Drum'),
+        t('Timpani'),
+        t('Snare Drum'),
+        t('Tambourine'),
+      )
+    ),
+  );
+  //$option2=array();
+  //drupal_set_message($options[$key]['Viola']);	  
+  if (isset($options2[$key])) {
+    return $options2[$key];
+  }
+  else {
+    return array();
+  }
+}
+
+function _ajax_rincian_options($key = '') {
+	$options2=array();
+	$pquery = 'SELECT distinct u.kodekeg, u.kegiatan ,k.kodero, k.uraian FROM `kegiatanrekening` as k inner join kegiatan as u on k.kodekeg=u.kodekeg order by u.kodekeg';// where uraian='.$key;
+	
+	$pres = db_query($pquery);
+	
+	//$kodej=null;
+	//$option[] = "- Pilih Jenis Rekening - ";
+	foreach ($pres as $prow) {
+		
+			$options2[$prow->kodekeg.'||'.$prow->kegiatan][$prow->kodero.'-'.$prow->uraian]=$prow->kodero.'-'.$prow->uraian;
+	
+		//drupal_set_message($key);
+	}
+	
+	
+  $options = array(
+    t('String') => drupal_map_assoc(
+      array(
+        t('Violin'),
+        t('Viola'),
+        t('Cello'),
+        t('Double Bass'),
+      )
+    ),
+    t('Woodwind') => drupal_map_assoc(
+      array(
+        t('Flute'),
+        t('Clarinet'),
+        t('Oboe'),
+        t('Bassoon'),
+      )
+    ),
+    t('Brass') => drupal_map_assoc(
+      array(
+        t('Trumpet'),
+        t('Trombone'),
+        t('French Horn'),
+        t('Euphonium'),
+      )
+    ),
+    t('Percussion') => drupal_map_assoc(
+      array(
+        t('Bass Drum'),
+        t('Timpani'),
+        t('Snare Drum'),
+        t('Tambourine'),
+      )
+    ),
+  );
+  //$option2=array();
+  //drupal_set_message($options[$key]['Viola']);	  
+  if (isset($options2[$key])) {
+    return $options2[$key];
+  }
+  else {
+    return array();
+  }
+}
+function bukubesar_title_callback() {
+    return t('Anggaran bukubesar');
+}
+
+ 
+
+ 
+

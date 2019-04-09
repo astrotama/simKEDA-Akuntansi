@@ -1,0 +1,58 @@
+insert into kegiatan_bl (kodekeg, kodepro, kodeuk, kegiatan)
+select kodekeg, kodepro, kodeuk, kegiatan from kegiatanskpd where jenis=2 and inaktif=0
+
+update kegiatan_bl inner join q_kegiatan_agg_pegawai
+on kegiatan_bl.kodekeg=q_kegiatan_agg_pegawai.kodekeg
+set kegiatan_bl.agg_pegawai=q_kegiatan_agg_pegawai.anggaran
+
+update kegiatan_bl inner join q_kegiatan_agg_barangjasa
+on kegiatan_bl.kodekeg=q_kegiatan_agg_barangjasa.kodekeg
+set kegiatan_bl.agg_barangjasa=q_kegiatan_agg_barangjasa.anggaran
+
+update kegiatan_bl inner join q_kegiatan_agg_modal
+on kegiatan_bl.kodekeg=q_kegiatan_agg_modal.kodekeg
+set kegiatan_bl.agg_modal=q_kegiatan_agg_modal.anggaran
+
+
+update kegiatan_bl inner join q_kegiatan_realisasi_jenis_barangjasa
+on kegiatan_bl.kodekeg=q_kegiatan_realisasi_jenis_barangjasa.kodekeg
+set kegiatan_bl.rea_barangjasa=q_kegiatan_realisasi_jenis_barangjasa.realisasi
+
+update kegiatan_bl inner join q_kegiatan_realisasi_jenis_pegawai
+on kegiatan_bl.kodekeg=q_kegiatan_realisasi_jenis_pegawai.kodekeg
+set kegiatan_bl.rea_pegawai=q_kegiatan_realisasi_jenis_pegawai.realisasi
+
+update kegiatan_bl inner join q_kegiatan_realisasi_jenis_modal
+on kegiatan_bl.kodekeg=q_kegiatan_realisasi_jenis_modal.kodekeg
+set kegiatan_bl.rea_modal=q_kegiatan_realisasi_jenis_modal.realisasi
+
+===================
+insert into anggperkegrealisasi (kodekeg, kodero, anggaran, bulan6, bulan12)
+select anggperkeg.kodekeg, anggperkeg.kodero, anggperkeg.jumlah anggaran, 0 bulan6, 0 bulan12
+from anggperkeg inner join kegiatanskpd on anggperkeg.kodekeg=kegiatanskpd.kodekeg
+inner join rincianobyek on anggperkeg.kodero=rincianobyek.kodero
+where kegiatanskpd.inaktif=0
+
+insert into anggperukrealisasi (kodeuk, kodekeg, kodero, anggaran, bulan6, bulan12)
+select anggperuk.kodeuk, '000000' kodekeg, anggperuk.kodero, anggperuk.jumlah anggaran, 0 bulan6, 0 bulan12
+from anggperuk inner join rincianobyek on anggperuk.kodero=rincianobyek.kodero
+
+update anggperkegrealisasi inner join q_kegiatan_realisasi_rincian_12
+on anggperkegrealisasi.kodekeg=q_kegiatan_realisasi_rincian_12.kodekeg
+and anggperkegrealisasi.kodero=q_kegiatan_realisasi_rincian_12.kodero
+set anggperkegrealisasi.bulan12=q_kegiatan_realisasi_rincian_12.realisasi
+
+update anggperkegrealisasi inner join q_kegiatan_realisasi_rincian_6
+on anggperkegrealisasi.kodekeg=q_kegiatan_realisasi_rincian_6.kodekeg
+and anggperkegrealisasi.kodero=q_kegiatan_realisasi_rincian_6.kodero
+set anggperkegrealisasi.bulan6=q_kegiatan_realisasi_rincian_6.realisasi
+
+update anggperukrealisasi inner join q_pendapatan_realisasi_rincian_6
+on anggperukrealisasi.kodeuk=q_pendapatan_realisasi_rincian_6.kodeuk
+and anggperukrealisasi.kodero=q_pendapatan_realisasi_rincian_6.kodero
+set anggperukrealisasi.bulan6=q_pendapatan_realisasi_rincian_6.realisasi
+
+update anggperukrealisasi inner join q_pendapatan_realisasi_rincian_12
+on anggperukrealisasi.kodeuk=q_pendapatan_realisasi_rincian_12.kodeuk
+and anggperukrealisasi.kodero=q_pendapatan_realisasi_rincian_12.kodero
+set anggperukrealisasi.bulan12=q_pendapatan_realisasi_rincian_12.realisasi

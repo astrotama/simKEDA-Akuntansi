@@ -1,0 +1,410 @@
+<?php
+ 
+/**
+ * For more informaiton about the different API controls available see:
+ * http://api.drupal.org/api/drupal/developer--topics--forms_api_reference.html/6
+ */
+ 
+function apbdkegrekening_menu() {
+    $items['apbdkegrekening'] = array(
+        'title' => 'Rekening Kegiatan',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('apbdkegrekening_form'),
+        'access callback' => TRUE,
+    );
+	$items['apbd/manageuser/edit'] = array (
+      'title' => 'Edit Operator',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('apbdop_edit_form'),
+      'access arguments' => array ('apbdop edit'),
+      'file' => 'apbdop/apbdop_edit_form.php',
+      'type' => MENU_CALLBACK,
+    );
+	$items['apbdkegrekening/akuntansi'] = array (
+      'title' => 'Anggaran Akuntansi',
+	  'description' => 'Anggaran Akuntansi',
+	  'title callback' => 'akuntansi_title_callback',	  
+      'page callback' => 'akuntansi_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'akuntansi_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+    return $items;
+}
+ 
+/**
+ * This is form containing every form element type available.
+ */
+function apbdkegrekening_form() {
+	
+	
+	$kodekeg=arg(1);
+	
+	drupal_add_css('files/css/kegiatancam.css');
+	drupal_add_js('files/js/kegiatancam.js');
+	drupal_add_js('files/js/apbdkegrekening.js');
+	$btn='<a  class="btn_blue" id="idi" style="color:#000000;margin-right: 10px;">Pilih</a>';
+	//echo $btn;
+	
+	$options_first = _ajax_example_get_first_dropdown();
+  // If we have a value for the first dropdown from $form_state['values'] we use
+  // this both as the default value for the first dropdown and also as a
+  // parameter to pass to the function that retrieves the options for the
+  // second dropdown.
+  //drupal_set_tittle('cek');
+  $selected = isset($form_state['values']['dropdown_first']) ? $form_state['values']['dropdown_first'] : key($options_first);
+
+  $form['dropdown_first'] = array(
+    '#type' => 'select',
+    '#title' => 'Jenis',
+    '#options' => $options_first,
+    '#default_value' => $selected,
+    // Bind an ajax callback to the change event (which is the default for the
+    // select form type) of the first dropdown. It will replace the second
+    // dropdown when rebuilt.
+    '#ajax' => array(
+      // When 'event' occurs, Drupal will perform an ajax request in the
+      // background. Usually the default value is sufficient (eg. change for
+      // select elements), but valid values include any jQuery event,
+      // most notably 'mousedown', 'blur', and 'submit'.
+      // 'event' => 'change',
+      'callback' => 'ajax_example_dependent_dropdown_callback',
+      'wrapper' => 'dropdown-second-replace',
+    ),
+  );
+
+  $form['dropdown_second'] = array(
+    '#type' => 'select',
+    '#title' => $options_first[$selected] . ' ' . t('Instruments'),
+    // The entire enclosing div created here gets replaced when dropdown_first
+    // is changed.
+    '#prefix' => '<div id="dropdown-second-replace">',
+    '#suffix' => '</div>',
+    // When the form is rebuilt during ajax processing, the $selected variable
+    // will now have the new value and so the options will change.
+    '#options' => _ajax_example_get_second_dropdown($selected),
+    '#default_value' => isset($form_state['values']['dropdown_second']) ? $form_state['values']['dropdown_second'] : '',
+  );
+	$form['formdata']['kegiatan']= array(
+		'#type'         => 'textfield', 
+		'#title'        => 'Rekening', 
+		//'#description'  => 'Rekening belanja', 
+		'#maxlength'    => 255, 
+		'#size'         => 70, 
+		//'#required'     => !$disabled, 
+		//'#disabled'     => $disabled, 
+		'#attributes' => array('class' => array('search-form')),
+		'#default_value'=> '', 
+		//'#suffix' =>$btn,
+	); 
+	$form['formdata']['keterangan'] = array (
+		'#type' => 'markup',
+		'#value' => "<span><font size='1'>Isi rekening dengan memilih menggunakan tombol Pilih</font></span>",
+	);	
+	$form['formdata']['jumlah']= array(
+		'#type'         => 'textfield', 
+		//'#type'         => 'item', 
+		'#title'        => 'Jumlah',
+		'#attributes'	=> array('style' => 'text-align: right'),
+		//'#disabled'     => true, 
+		'#description'  => 'Jumlah anggaran, jumlahnya akan terisi secara otomatis saat detilnya diisi', 
+		//'#maxlength'    => 60, 
+		'#size'         => 30, 
+		//'#required'     => !$disabled, 
+		//'#disabled'     => $disabled, 
+		'#default_value'=> '', 
+		//'#value'=> $jumlah, 
+	); 
+	$form['formdata']['jumlahsebelum']= array(
+		'#type'         => 'hidden', 
+		'#title'        => 'Tahun Lalu',
+		'#attributes'	=> array('style' => 'text-align: right'),
+		'#description'  => 'Jumlah anggaran tahun lalu, bila ada silahkan diisi', 
+		//'#maxlength'    => 60, 
+		'#size'         => 30, 
+		//'#required'     => !$disabled, 
+		//'#disabled'     => $disabled, 
+		'#default_value'=> '', 
+	); 
+	$form['formdata']['jumlahsesudah']= array(
+		'#type'         => 'textfield', 
+		'#title'        => 'Tahun Depan',
+		'#attributes'	=> array('style' => 'text-align: right'),
+		'#description'  => 'Jumlah perkiraan anggaran tahun depan, diisi sesuai perkiraan',  
+		//'#maxlength'    => 60, 
+		'#size'         => 30, 
+		//'#required'     => !$disabled, 
+		//'#disabled'     => $disabled, 
+		'#default_value'=> '', 
+	); 
+	$form['tabledragrows'] = array(
+	  '#prefix' => '<div id="tabledragrows"><p id="idi">First Paragraph</p><div id="google"></div>',
+	  '#suffix' => '</div>',
+	  '#tree' => TRUE,
+	  '#theme' => 'table',
+	  '#header' => array('REK',t('Rekening'), t('Uraian')),
+	  '#rows' => array(),
+	);
+    for ($i=0;$i<5;$i++) {
+         $fname = array(
+			'#id' => 'tabledragrows-' . $i . '-fname',
+			'#type' => 'textfield',
+			'#default_value' => 'satu',
+			'#suffix' => '<input type="submit" id="edit-pilih" name="op" value="Pilih" class="form-submit">',
+		  );
+		  $sname = array(
+			'#id' => 'tabledragrows-' . $i . '-sname',
+			'#type' => 'textfield',
+			'#default_value' => 'duwa',
+		  );
+
+		  /*$form['tabledragrows'][] = array(
+			'fname' => &$fname,
+			'sname' => &$sname,
+		  );*/
+		  
+		  
+
+		  $form['tabledragrows']['#rows'][] = array(
+			'',
+			array('data' => &$fname),
+			array('data' => &$sname),
+		  );
+		
+		
+       
+    }
+ 
+	$form['maxdetil']= array(
+		'#type'         => 'hidden', 
+		'#title'        => 'kodero', 
+		'#default_value'=> '', 
+	); 
+ 
+	
+
+	
+		$form['formdata']['submitnew'] = array (
+			'#type' => 'submit',
+			'#value' => 'Rek. Baru',
+			//'#weight' => 5,
+		);
+		$form['submitnew'] = array (
+			'#type' => 'submit',
+			'#value' => 'Rek. Baru',
+			//'#weight' => 5,
+		);
+
+		$form['formdata']['submitnewdetil'] = array (
+			'#type' => 'submit',
+			'#value' => 'Tambah Detil',
+			//'#weight' => 6,
+		);
+		$form['submitnewdetil'] = array (
+			'#type' => 'submit',
+			'#value' => 'Tambah Detil',
+			//'#weight' => 6,
+		);
+	
+	
+		$form['formdata']['submit'] = array(
+			'#type' => 'submit',
+			'#suffix' => "&nbsp;<a href='/apbd/kegiatanskpd/rekening/" . $kodekeg . "' class='btn_blue' style='color: white'>Tutup</a>",
+			'#value' => 'Simpan',
+			//'#weight' => 7,
+		);
+		$form['submit'] = array(
+			'#type' => 'submit',
+			'#suffix' => "&nbsp;<a href='/apbd/kegiatanskpd/rekening/" . $kodekeg . "' class='btn_blue' style='color: white'>Tutup</a>",
+			'#value' => 'Simpan',
+			//'#weight' => 7,
+		);
+	
+    return $form;
+}
+
+
+/**
+ * Helper function to populate the first dropdown.
+ *
+ * This would normally be pulling data from the database.
+ *
+ * @return array
+ *   Dropdown options.
+ */
+function _ajax_example_get_first_dropdown() {
+  // drupal_map_assoc() just makes an array('String' => 'String'...).
+  if (isSuperuser()) {
+		$kodek = '4';
+		$customwhere = sprintf(' and left(k.kodero,1)=\'%s\' ', $kodek);
+	} else {
+		
+		if (apbd_getuseruk()=='81') {
+			$kodek = '4';
+			$customwhere = sprintf(' and left(k.kodero,1)=\'%s\' ', $kodek);
+		}
+		else {
+			$kodek = '41';
+			$customwhere = sprintf(' and left(k.kodero,2)=\'%s\' ', $kodek);
+		}
+	}
+  if (isSuperuser()) 
+		$pquery = 'select kodej kodeu, uraian urusansingkat from jenis where left(kodek,1)='.$kodek.' order by kodej';
+	else {
+	
+		if (apbd_getuseruk()=='81') {
+			$pquery = 'select kodej kodeu, uraian urusansingkat from jenis where left(kodek,1)='.$kodek.' order by kodej';
+
+			//$pquery = 'select kodej kodeu, uraian urusansingkat from jenis where kodek=\'%s\' order by kodej';
+			
+			
+		} else
+			$pquery = 'select kodej kodeu, uraian urusansingkat from jenis where kodek='.$kodek.' order by kodej';
+	}
+	$pres = db_query($pquery);
+	
+	
+	$option[] = "- Pilih Jenis Rekening - ";
+	foreach ($pres as $prow) {
+		//$option[]= $prow->kodeu . ' - ' . $prow->urusansingkat;
+		$option[]= $prow->urusansingkat;
+		//drupal_set_message($pquery);
+	}
+  $opt=array(
+		  t('String'),
+		  t('Woodwind'),
+		  t('Brass'),
+		  t('Percussion'),
+	  );
+  
+  return drupal_map_assoc(
+    $option
+  );
+}
+
+/**
+ * Helper function to populate the second dropdown.
+ *
+ * This would normally be pulling data from the database.
+ *
+ * @param string $key
+ *   This will determine which set of options is returned.
+ *
+ * @return array
+ *   Dropdown options
+ */
+function _ajax_example_get_second_dropdown($key = '') {
+	$options2=array();
+	if (isSuperuser()) {
+		$kodek = '4';
+		$customwhere = sprintf(' and left(k.kodero,1)=\'%s\' ', $kodek);
+	} else {
+		
+		if (apbd_getuseruk()=='81') {
+			$kodek = '4';
+			$customwhere = sprintf(' and left(k.kodero,1)=\'%s\' ', $kodek);
+		}
+		else {
+			$kodek = '41';
+			$customwhere = sprintf(' and left(k.kodero,2)=\'%s\' ', $kodek);
+		}
+	}
+  if (isSuperuser()) 
+		$pquery = 'select kodej kodeu, uraian urusansingkat from jenis where left(kodek,1)='.$kodek.' order by kodej';
+	else {
+	
+		if (apbd_getuseruk()=='81') {
+			$pquery = 'select kodej kodeu, uraian urusansingkat from jenis where left(kodek,1)='.$kodek.' order by kodej';
+
+			//$pquery = 'select kodej kodeu, uraian urusansingkat from jenis where kodek=\'%s\' order by kodej';
+			
+			
+		} else
+			$pquery = 'select kodej kodeu, uraian urusansingkat from jenis where kodek='.$kodek.' order by kodej';
+	}
+	$pres = db_query($pquery);
+	
+	//$kodej=null;
+	$option[] = "- Pilih Jenis Rekening - ";
+	foreach ($pres as $prow) {
+		$option[]= $prow->urusansingkat;
+		$kodej=$prow->kodeu;
+		$oquery = 'select * from obyek where kodej='.$kodej;
+		$ores = db_query($oquery);
+		foreach ($ores as $row) {
+			$options2[$prow->urusansingkat][$row->uraian]=$row->uraian;
+		}
+		//drupal_set_message($pquery);
+	}
+	
+	for($n=0;$n<sizeof($option);$n++){
+		
+	}
+  $options = array(
+    t('String') => drupal_map_assoc(
+      array(
+        t('Violin'),
+        t('Viola'),
+        t('Cello'),
+        t('Double Bass'),
+      )
+    ),
+    t('Woodwind') => drupal_map_assoc(
+      array(
+        t('Flute'),
+        t('Clarinet'),
+        t('Oboe'),
+        t('Bassoon'),
+      )
+    ),
+    t('Brass') => drupal_map_assoc(
+      array(
+        t('Trumpet'),
+        t('Trombone'),
+        t('French Horn'),
+        t('Euphonium'),
+      )
+    ),
+    t('Percussion') => drupal_map_assoc(
+      array(
+        t('Bass Drum'),
+        t('Timpani'),
+        t('Snare Drum'),
+        t('Tambourine'),
+      )
+    ),
+  );
+  //$option2=array();
+  //drupal_set_message($options[$key]['Viola']);	  
+  if (isset($options2[$key])) {
+    return $options2[$key];
+  }
+  else {
+    return array();
+  }
+}
+
+/**
+ * Implements hook_validate() for the apbdkegrekening_form() form.
+ */
+function apbdkegrekening_form_validate($form, &$form_state) {
+	
+}/**
+ * Implements hook_submit() for the apbdkegrekening_form() form.
+ */
+function apbdkegrekening_form_submit($form, &$form_state) {
+	if($form_state['clicked_button']['#value'] == $_POST['op']){
+		//drupal_set_message("PILIH");
+	}
+	drupal_set_message($form_state['clicked_button']['#value']);
+}
+/**
+ * Implementation of hook_theme().
+ */
+
+/**
+ * Theme for form_element_form. Used to create the tabledrag element and then
+ * render the rest of the form.
+ */

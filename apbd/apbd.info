@@ -1,0 +1,6 @@
+; $Id$
+name = "APBD Modul Umum"
+description = "Sistem Informasi Eksekutif APBD - Modul Umum"
+;dependencies[] = 
+core = 7.x
+package="APBD R1"
