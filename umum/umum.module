@@ -1,0 +1,168 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_perm().
+ */
+//onModuleCreationWizard
+function umum_perm() {
+    return array(
+        'access penata content',
+		'access laporan penata'
+	);
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+
+function umum_menu() {
+
+	$items['umum'] = array (
+      'title' => 'Jurnal Umum',
+	  'description' => 'Jurnal Umum',
+	  'title callback' => 'umum_title_callback',	  
+      'page callback' => 'umum_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'umum_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['umum/jurnal'] = array (
+      'title' => 'Jurnal Umum',
+	  'description' => 'Jurnal Umum',
+	  'title callback' => 'umum_title_callback',	  
+      'page callback' => 'umum_edit_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'umum_edit_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+	$items['umum/delete'] = array (
+      'title' => 'Hapus Jurnal',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('umum_delete_form'),
+      //'access arguments' => array ('jurnal pendapatan pusat'),
+	  'access callback' => 'user_is_logged_in',
+      'file' => 'umum_delete_form.php',
+      'type' => MENU_CALLBACK,
+    );	
+
+
+	$items['umum/selectuk'] = array (
+      'title' => 'Jurnal Umum | Pilih SKPD',
+	  'description' => 'Jurnal Umum | Pilih SKPD',
+	  //'title callback' => 'umum_title_callback',	  
+      'page callback' => 'umumkeg_selectuk_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'umumkeg_selectuk_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['umum/newpick'] = array (
+      'title' => 'Jurnal Umum | Pilih Kegiatan',
+	  'description' => 'Jurnal Umum | Pilih Kegiatan',
+	  //'title callback' => 'umum_title_callback',	  
+      'page callback' => 'umumkeg_newpick_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'umumkeg_newpick_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['umum/newpost'] = array (
+      'title' => 'Jurnal Umum',
+	  'description' => 'Jurnal Umum',
+	  //'title callback' => 'umum_title_callback',	  
+      'page callback' => 'umumkeg_newpost_main',
+      //'access arguments' => array ('access content'), 
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'umumkeg_newpost_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+
+	$items['umum/kasnew'] = array (
+      'title' => 'Jurnal Kas Umum',
+	  'description' => 'Jurnal Kas Umum',
+	  //'title callback' => 'umum_title_callback',	  
+      'page callback' => 'umumkas_new_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'umumkas_new_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+
+	$items['umum/antrian'] = array (
+      'title' => 'Jurnal Umum | Pilih Pengembalian',
+	  'description' => 'Jurnal Umum | Pilih Pengembalian',
+	  //'title callback' => 'umum_title_callback',	  
+      'page callback' => 'umum_antrian_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'umum_antrian_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+	$items['umum/jurnalkas'] = array (
+      'title' => 'Jurnal Umum | Pengembalian Kas',
+	  'description' => 'Jurnal Umum | Pengembalian Kas',
+	  //'title callback' => 'jurnalspjjurnal_title_callback',	  
+      'page callback' => 'umum_newkas_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'umum_newkas_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['umum/jurnalkeg'] = array (
+      'title' => 'Jurnal Umum | Pengembalian Belanja',
+	  'description' => 'Jurnal Umum | Pengembalian Belanja',
+	  //'title callback' => 'jurnalspjjurnal_title_callback',	  
+      'page callback' => 'umum_newkeg_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'umum_newkeg_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['umum/jurnalpad'] = array (
+      'title' => 'Jurnal Umum | Pendapatan',
+	  'description' => 'Jurnal Umum | Pendapatan',
+	  //'title callback' => 'jurnalspjjurnal_title_callback',	  
+      'page callback' => 'umum_newpad_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'umum_newpad_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+	/*
+	$items['umumpusat/antrian'] = array (
+      'title' => 'Jurnal Umum | Pilih Pengembalian',
+	  'description' => 'Jurnal Umum | Pilih Pengembalian',
+	  //'title callback' => 'umum_title_callback',	  
+      'page callback' => 'umumpusat_antrian_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'umumpusat_antrian_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+	*/
+	
+    return $items;
+}
+
+
+function umum_title_callback() {
+    return t('Jurnal Umum');
+}
+
+

@@ -1,0 +1,6 @@
+; $Id$
+name = "Rekening Module"
+description = "Penatausahaan - Rekening Module"
+;dependencies[] = 
+core = 7.x
+package="simKEDA"

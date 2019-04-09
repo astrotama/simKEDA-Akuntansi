@@ -1,0 +1,26 @@
+<?php
+
+//onModuleCreationWizard
+function refresh_permission() {
+  return array(
+    'refresh permission' => array(
+      'title' => t('Refresh Permission'),
+      'description' => t('Reset cache and blocke d user'),
+    ),
+  );
+}
+
+function refresh_menu() {
+	$items['refresh'] = array (
+      'title' => 'Refresh Page',
+	  'description' => 'Refresh Page', 
+      'page callback' => 'refresh_main',
+	  //'access callback' => 'user_is_logged_in',
+	  'access arguments' => array ('refresh permission'),
+      'weight' => 11,
+      'file' => 'refresh_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+	    return $items;
+}

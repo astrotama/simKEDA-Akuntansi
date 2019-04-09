@@ -1,0 +1,6 @@
+; $Id$
+name = "Refresh Module"
+description = "Delete cache and delete flood"
+;dependencies[] = 
+core = 7.x
+package="refresh"

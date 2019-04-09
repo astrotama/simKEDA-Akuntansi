@@ -1,0 +1,152 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_perm().
+ */
+//onModuleCreationWizard
+function rekening_perm() {
+    return array(
+        'access penata content',
+		'access rekening penata'
+	);
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+
+function rekening_menu() {
+
+	$items['rekening/jenis'] = array (
+      'title' => 'Rekening APBD',
+	  'description' => 'Rekening APBD',
+	  //'title callback' => 'rekeningarsip_title_callback',	  
+      'page callback' => 'rekening_jenis_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'rekening_jenis_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+    
+	$items['rekening/obyek'] = array (
+      'title' => 'Rekening APBD | Obyek',
+	  'description' => 'Rekening APBD | Obyek',
+	  //'title callback' => 'rekeningarsip_title_callback',	  
+      'page callback' => 'rekening_obyek_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'rekening_obyek_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+    
+	$items['rekening/rincian'] = array (
+      'title' => 'Rekening APBD | Rincian',
+	  'description' => 'Rekening APBD | Rincian',
+	  //'title callback' => 'rekeningarsip_title_callback',	  
+      'page callback' => 'rekening_rincian_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'rekening_rincian_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+	$items['rekening/selectmaplra'] = array (
+      'title' => 'Rekening APBD | Pilih Mapping SAP-LRA',
+	  'description' => 'Rekening APBD | Pilih Mapping SAP-LRA',
+	  //'title callback' => 'rekeningarsip_title_callback',	  
+      'page callback' => 'rekening_selectmap_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'rekening_selectmap_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['rekening/selectmapsap'] = array (
+      'title' => 'Rekening APBD | Pilih Mapping SAP-LO/Neraca',
+	  'description' => 'Rekening APBD | Pilih Mapping SAP-LO/Neraca',
+	  //'title callback' => 'rekeningarsip_title_callback',	  
+      'page callback' => 'rekening_selectmapsap_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'rekening_selectmapsap_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+    
+    //SAP
+	$items['rekeningsap/jenis'] = array (
+      'title' => 'Rekening SAP',
+	  'description' => 'Rekening SAP',
+	  //'title callback' => 'rekeningarsip_title_callback',	  
+      'page callback' => 'rekeningsap_jenis_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'rekeningsap_jenis_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+    
+	$items['rekeningsap/obyek'] = array (
+      'title' => 'Rekening SAP | Obyek',
+	  'description' => 'Rekening SAP | Obyek',
+	  //'title callback' => 'rekeningarsip_title_callback',	  
+      'page callback' => 'rekeningsap_obyek_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'rekeningsap_obyek_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+    
+	$items['rekeningsap/rincian'] = array (
+      'title' => 'Rekening SAP | Rincian',
+	  'description' => 'Rekening SAP | Rincian',
+	  //'title callback' => 'rekeningarsip_title_callback',	  
+      'page callback' => 'rekeningsap_rincian_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'rekeningsap_rincian_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+	$items['rekening/prognosis'] = array (
+      'title' => 'Rekening Prognosis',
+	  'description' => 'Rekening Prognosis',
+	  //'title callback' => 'rekeningarsip_title_callback',	  
+      'page callback' => 'rekening_prognosis_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'rekening_prognosis_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+	$items['rekeningdetil/prognosis'] = array (
+      'title' => 'Rekening Prognosis',
+	  'description' => 'Rekening Prognosis',
+	  //'title callback' => 'rekeningarsip_title_callback',	  
+      'page callback' => 'rekeningdetil_prognosis_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'rekeningdetil_prognosis_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+	$items['rekeningkeg/prognosis'] = array (
+      'title' => 'Rekening Prognosis',
+	  'description' => 'Rekening Prognosis',
+	  //'title callback' => 'rekeningarsip_title_callback',	  
+      'page callback' => 'rekeningkeg_prognosis_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'rekeningkeg_prognosis_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+	
+    return $items;
+}

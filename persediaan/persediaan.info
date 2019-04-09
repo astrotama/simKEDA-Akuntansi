@@ -1,0 +1,6 @@
+; $Id$
+name = "Jurnal Persediaan"
+description = "simAkuntansi - Jurnal Persediaan"
+;dependencies[] = 
+core = 7.x
+package="Akuntansi"
