@@ -1,0 +1,140 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_perm().
+ */
+//onModuleCreationWizard
+function jurnalspj_perm() {
+    return array(
+        'access penata content',
+		'access laporan penata'
+	);
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+
+function jurnalspj_menu() {
+
+	$items['jurnalspjantrian'] = array (
+      'title' => 'Antrian Jurnal Belanja',
+	  'description' => 'Antrian Jurnal Belanja',
+	  //'title callback' => 'jurnalspjantrian_title_callback',	  
+      'page callback' => 'jurnalspjantrian_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'jurnalspjantrian_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['jurnalspjantrian/jurnal'] = array (
+      'title' => 'Jurnal Belanja',
+	  'description' => 'Jurnal Belanja',
+	  //'title callback' => 'jurnalspjjurnal_title_callback',	  
+      'page callback' => 'jurnalspjjurnal_post_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'jurnalspjjurnal_post_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['jurnalspjjurnal/jurnaledit'] = array (
+      'title' => 'Jurnal Belanja',
+	  'description' => 'Jurnal Belanja',
+	  //'title callback' => 'jurnalspjjurnal_title_callback',	  
+      'page callback' => 'jurnalspjjurnal_edit_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'jurnalspjjurnal_edit_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+	$items['jurnalspjbatch'] = array (
+      'title' => 'Jurnalkan Belanja',
+	  'description' => 'Jurnalkan Belanja',
+	  //'title callback' => 'jurnalspjantrian_title_callback',	  
+      'page callback' => 'jurnalspjbatch_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'jurnalspjbatch_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+	$items['jurnalspjjurnal'] = array (
+      'title' => 'Arsip Jurnal Belanja',
+	  'description' => 'Arsip Jurnal Belanja',
+	  //'title callback' => 'jurnalspjjurnal_title_callback',	  
+      'page callback' => 'jurnalspjjurnal_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'jurnalspjjurnal_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+	$items['jurnalspjjurnal/delete'] = array (
+      'title' => 'Hapus Jurnal',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('jurnalspjjurnal_delete_form'),
+      //'access arguments' => array ('desa penghapusan'),
+	  'access arguments' => array ('access content'),
+      'file' => 'jurnalspjjurnal_delete_form.php',
+      'type' => MENU_CALLBACK,
+    );
+	
+
+    return $items;
+}
+
+
+function jurnalspjantrian_title_callback() {
+    return t('Antrian Jurnal Belanja');
+}
+
+function belanja_get_antrian_spj() {
+	$x = 0;
+	
+	
+	if (isUserSKPD()) {	
+		$kodeuk = apbd_getuseruk();
+		db_set_active('penatausahaan');
+		
+		$res = db_query('select count(dokid) as jumlah from dokumen where sp2dok>0 and jurnalsudahuk=0 and kodeuk=:kodeuk and length(sp2dno)>0 and jenisdokumen in (1, 3, 4, 5, 7)', array(':kodeuk'=>$kodeuk));
+		foreach ($res as $dat) {
+			$x = $dat->jumlah;
+			//drupal_set_message($dat->jumlah);
+		}	
+		db_set_active();	
+	} else {
+
+	}	
+	
+	
+	return $x;
+}
+
+function belanja_get_antrian_kas() {
+	$x = 0;
+	
+	
+	if (isUserSKPD()) {	
+		$kodeuk = apbd_getuseruk();
+		db_set_active('penatausahaan');
+		
+		$res = db_query('select count(dokid) as jumlah from dokumen where sp2dok>0 and jurnalkassudahuk=0 and kodeuk=:kodeuk and length(sp2dno)>0 and jenisdokumen in (0, 1, 2)', array(':kodeuk'=>$kodeuk));
+		foreach ($res as $dat) {
+			$x = $dat->jumlah;
+			//drupal_set_message($dat->jumlah);
+		}	
+		db_set_active();	
+	} else {
+
+	}	
+	
+	
+	return $x;
+}

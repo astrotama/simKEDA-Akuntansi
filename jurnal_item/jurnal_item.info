@@ -1,0 +1,6 @@
+; $Id$
+name = "jurnal item modul"
+description = "modul jurnal item"
+;dependencies[] = 
+core = 7.x
+package="inv18"

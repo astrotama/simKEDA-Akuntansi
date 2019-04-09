@@ -1,0 +1,277 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_perm().
+ */
+//onModuleCreationWizard
+function laporan_perm() {
+    return array(
+        'access laporan content',
+		'access laporan laporan'
+	);
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+
+function laporan_menu() {
+	
+	 $items['laporan/skpd'] = array (
+      'title' => 'SKPD yang Belum Mengisi Prognosis',
+	  'description' => 'Daftar SKPD',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_skpd_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_skpd_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+	$items['laporanjurnal'] = array (
+      'title' => 'Jurnal',
+	  'description' => 'Jurnal',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_jurnal_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_jurnal_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+    $items['laporan'] = array (
+      'title' => 'Laporan Realisasi per Rekening',
+	  'description' => 'Laporan Realisasi per Rekening',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+    $items['laporandetil'] = array (
+      'title' => 'Laporan Realisasi per Obyek/Rekening',
+	  'description' => 'Laporan Realisasi per Obyek/Rekening',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_detil_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_detil_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+    $items['laporandetiluk'] = array (
+      'title' => 'Laporan Realisasi per SKPD',
+	  'description' => 'Laporan Realisasi per SKPD',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_detiluk_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_detiluk_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+    $items['laporandetilkeg'] = array (
+      'title' => 'Laporan Realisasi per Kegiatan',
+	  'description' => 'Laporan Realisasi per Kegiatan',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_detilkeg_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_detilkeg_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+    $items['laporandetilpro'] = array (
+      'title' => 'Laporan Realisasi per Program',
+	  'description' => 'Laporan Realisasi per Program',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_detilpro_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_detilpro_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+	$items['laporankeg'] = array (
+      'title' => 'Laporan Realisasi per Kegiatan/Rekening',
+	  'description' => 'Laporan Realisasi per Kegiatan/Rekening',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_keg_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_keg_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporankegpage'] = array (
+      'title' => 'Laporan Realisasi per Kegiatan/Rekening',
+	  'description' => 'Laporan Realisasi per Kegiatan/Rekening',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_kegpage_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_kegpage_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+	$items['laporanfu'] = array (
+      'title' => 'Laporan Realisasi per Fungsi/Urusan',
+	  'description' => 'Laporan Realisasi per Fungsi/Urusan',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_fu_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_fu_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporanfu_keg'] = array (
+      'title' => 'Laporan Realisasi per Fungsi/Urusan',
+	  'description' => 'Laporan Realisasi per Fungsi/Urusan',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_fu_keg_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_fu_keg_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporanfutest'] = array (
+      'title' => 'Laporan Realisasi per Fungsi/Urusan',
+	  'description' => 'Laporan Realisasi per Fungsi/Urusan',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_fu_test_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_fu_test_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporanrekon'] = array (
+      'title' => 'Rekon Realisasi Pusat/SKPD',
+	  'description' => 'Rekon Realisasi Pusat/SKPD',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_rekon_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_rekon_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporanrekonkeg'] = array (
+      'title' => 'Rekon Realisasi Kegiatan Pusat/SKPD',
+	  'description' => 'Rekon Realisasi Kegiatan Pusat/SKPD',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_rekonkeg_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_rekonkeg_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporanrekonsp2d'] = array (
+      'title' => 'Rekon Realisasi Akuntansi/SP2D',
+	  'description' => 'Rekon Realisasi Akuntansi/SP2D',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_rekonsp2d_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_rekonsp2d_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporanrekonkas'] = array (
+      'title' => 'Rekon Realisasi Akuntansi/SPJ',
+	  'description' => 'Rekon Realisasi Akuntansi/SPJ',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_rekonkas_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_rekonkas_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporanrekonskpdsp2d'] = array (
+      'title' => 'Rekon Realisasi Pusat/SKPD',
+	  'description' => 'Rekon Realisasi Pusat/SKPD',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporanuk_rekonsp2d_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporanuk_rekonsp2d_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+	$items['laporanskpd'] = array (
+      'title' => 'Laporan Realisasi per SKPD',
+	  'description' => 'Laporan Realisasi per SKPD',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporanuk_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporanuk_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+
+	$items['laporankas'] = array (
+      'title' => 'Laporan Anggaran Kas per SKPD',
+	  'description' => 'Laporan Anggaran Kas per SKPD',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporankas_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporankas_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );		
+	$items['laporanprognosis'] = array (
+      'title' => 'Laporan Prognosis',
+	  'description' => 'Laporan Prognosis',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_prognosis_main', 
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_prognosis_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporanprognosiskeg'] = array (
+      'title' => 'Laporan Prognosis Kegiatan',
+	  'description' => 'Laporan Prognosis Kegiatan',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_prognosiskeg_main', 
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_prognosiskeg_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+	$items['laporanresume'] = array (
+      'title' => 'Resume Laporan',
+	  'description' => 'Resume Laporan',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporan_resume_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_resume_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+    return $items;
+}
+
+/*
+-
+*/
+
+?>

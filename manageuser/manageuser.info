@@ -1,0 +1,6 @@
+; $Id$
+name = "MAnage User"
+description = "simAkuntansi - MAnage User"
+;dependencies[] = 
+core = 7.x
+package="Operator"

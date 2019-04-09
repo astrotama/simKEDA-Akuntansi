@@ -1,0 +1,88 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_perm().
+ */
+//onModuleCreationWizard
+function laporan2_perm() {
+    return array(
+        'access penata content',
+		'access laporan2 penata'
+	);
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+
+function laporan2_menu() {
+
+	$items['laporan2'] = array (
+      'title' => 'laporan2',
+	  'description' => 'laporan2 user',
+	  'title callback' => 'laporan2_title_callback',	  
+      'page callback' => 'laporan_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporanrekap'] = array (
+      'title' => 'laporan Rekapitulasi',
+	  'description' => 'laporan2 user',
+	  'title callback' => 'laporan2_title_callback',	  
+      'page callback' => 'laporanrekap_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporanrekap_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporanbp2d'] = array (
+      'title' => 'laporan Rekapitulasi',
+	  'description' => 'laporan2 user',
+	  'title callback' => 'laporan2_title_callback',	  
+      'page callback' => 'laporanbp2d_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporanbp2d_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporanbp2d2'] = array (
+      'title' => 'laporan BP2D ke-2',
+	  'description' => 'laporan2 user',
+	  'title callback' => 'laporan2_title_callback',	  
+      'page callback' => 'laporanbp2d2_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporanbp2d2_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+	$items['laporanpk'] = array (
+      'title' => 'laporan Pembayaran Kekurangan ke-2',
+	  'description' => 'laporan2 user',
+	  'title callback' => 'laporan2_title_callback',	  
+      'page callback' => 'laporan3_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporan3_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+	
+
+    return $items;
+}
+
+
+function laporan2_title_callback() {
+    return t('Print out laporan2');
+}
+
+

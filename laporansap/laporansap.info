@@ -1,0 +1,6 @@
+; $Id$
+name = "Laporan SAP"
+description = "Sistem Informasi Akuntansi - Laporan SAP"
+;dependencies[] = 
+core = 7.x
+package="APBD R1"

@@ -1,0 +1,6 @@
+; $Id$
+name = "Laporan Prognosis"
+description = "Sistem Informasi Eksekutif Prognosis - Laporan"
+;dependencies[] = 
+core = 7.x
+package="APBD R1"

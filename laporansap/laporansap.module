@@ -1,0 +1,131 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_perm().
+ */
+//onModuleCreationWizard
+function laporansap_perm() {
+    return array(
+        'access laporan sap content',
+		'access laporan sap laporan'
+	);
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+
+function laporansap_menu() {
+
+
+	$items['laporanlo'] = array (
+      'title' => 'Laporan Operasional',
+	  'description' => 'Laporan Operasional',
+	  //'title callback' => 'laporansap_title_callback',	  
+      'page callback' => 'laporansap_lo_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporansap_lo_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+	$items['laporanneraca'] = array (
+      'title' => 'Laporan Neraca',
+	  'description' => 'Laporan Neraca',
+	  //'title callback' => 'laporansap_title_callback',	  
+      'page callback' => 'laporansap_neraca_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporansap_neraca_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+	$items['laporanlpe'] = array (
+      'title' => 'Laporan Perubahan Ekuitas',
+	  'description' => 'Laporan Perubahan Ekuitas',
+	  //'title callback' => 'laporansap_title_callback',	  
+      'page callback' => 'laporansap_lpe_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporansap_lpe_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+
+	$items['laporansap'] = array (
+      'title' => 'Laporan Realisasi SAP',
+	  'description' => 'Laporan Realisasi SAP',
+	  //'title callback' => 'laporansap_title_callback',	  
+      'page callback' => 'laporansap_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporansap_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+	
+	$items['laporansapdetil'] = array (
+      'title' => 'Detil Realisasi SAP',
+	  'description' => 'Detil Realisasi SAP',
+	  //'title callback' => 'laporansap_title_callback',	  
+      'page callback' => 'laporansap_detil_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporansap_detil_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );		
+	$items['laporansapdetillo'] = array (
+      'title' => 'Detil Realisasi LO',
+	  'description' => 'Detil Realisasi LO',
+	  //'title callback' => 'laporansap_title_callback',	  
+      'page callback' => 'laporansap_detillo_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporansap_detillo_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );		
+    $items['laporansapdetiluk'] = array (
+      'title' => 'Laporan Realisasi per SKPD',
+	  'description' => 'Laporan Realisasi per SKPD',
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'laporansap_detiluk_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporansap_detiluk_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+    return $items;
+}
+
+
+function get_sap_value($akun, $debetkredit, $kreditdebet) {
+	
+	$x = substr($akun,0,1);
+	if ($x=='1')
+		$ret = 	$debetkredit;
+	else if ($x=='2')
+		$ret = 	$kreditdebet;
+	else if ($x=='3')	
+		$ret = 	$debetkredit;
+	else if ($x=='4')	
+		$ret = 	$kreditdebet;
+	else if ($x=='5')	
+		$ret = 	$debetkredit;
+	else if ($x=='8')	
+		$ret = 	$kreditdebet;
+	else if ($x=='9')	
+		$ret = 	$debetkredit;
+	else if ($x=='9') {	
+		$realisasi = ((substr($kodej,0,2)=='91') ? $kreditdebet : $debetkredit);
+	}
+	
+	return $ret;
+}
+?>

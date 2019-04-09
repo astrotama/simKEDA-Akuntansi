@@ -1,0 +1,67 @@
+<?php
+
+function laporanprognosis_menu() {
+	 
+  $items['laporanprognosis'] = array(
+    'title' => t('Laporan Prognosis'),
+	'page callback' => 'verifikasisppgu_form',
+    'access callback' => TRUE,
+  ); 
+
+  //verifikasisppgu_verify_form
+  $items['laporanprognosis/into'] = array(
+    'title' => t('Laporan Prognosis'),
+	'page callback' => 'laporanprognosis_form',
+	'type' => MENU_DEFAULT_LOCAL_TASK,		//MENU_CALLBACK,	
+	'access callback' => TRUE,
+  );
+  
+  $items['laporanprognosis/input'] = array(
+      'title' => '[4] Verifikasi',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('verifikasisppgu_verify_form'),
+      //'access arguments' => array ('desa penghapusan'),
+	  'access arguments' => array ('access content'),
+      'file' => 'gubaruspp_verifikasi_form.php',
+      'type' => MENU_LOCAL_TASK,		//MENU_CALLBACK,	
+  );
+
+  $items['laporanprognosis/realisasi'] = array(
+      'title' => '[3] SPP2',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('verifikasisppgu_spp2_form'),
+      //'access arguments' => array ('desa penghapusan'),
+	  'access arguments' => array ('access content'),
+      'file' => 'gubaruspp_verifikasi_form.php',
+      'type' => MENU_LOCAL_TASK,		//MENU_CALLBACK,	
+  );
+
+
+  return $items;
+}
+
+function laporanprognosis_form() {
+	
+	$dokid = arg(1);
+	if ($dokid=='') {
+		$dokid = $_SESSION["verifikasi_spp_gu"];
+	} else {
+		$_SESSION["verifikasi_spp_gu"] = $dokid;
+	}
+		
+	$form['description'] = array(
+		'#type' => 'item',
+		'#title' => t('A form with nothing but a textfield A'),
+	);
+
+	$form['formdata']['submitback']= array(
+		'#type' => 'submit',
+		'#value' => '<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span> Kembali ke SPP',
+		'#attributes' => array('class' => array('btn btn-danger btn-sm pull-right')),
+	);	
+	return $form;
+}
+
+function laporanprognosis_form_submit() {
+	drupal_goto('');
+}

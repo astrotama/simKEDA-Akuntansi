@@ -1,0 +1,402 @@
+<?php
+function kaskeluarantrian_main($arg=NULL, $nama=NULL) {
+	$qlike='';
+	$limit = 10;
+    
+	if ($arg) {
+		switch($arg) {
+			case 'show':
+				$qlike = " and lower(k.kegiatan) like lower('%%%s%%')";    
+				break;
+			case 'filter':
+			
+				//drupal_set_message('filter');
+				//drupal_set_message(arg(5));
+				
+				$kodeuk = arg(2);
+				$bulan = arg(3);
+				$jenisdokumen = arg(4);
+				$statusjurnal = arg(5);
+				$keyword = arg(6);
+
+				break;
+				
+			case 'excel':
+				break;
+
+			default:
+				//drupal_access_denied();
+				break;
+		}
+	} else {
+		//drupal_set_message('x');
+		if (isUserSKPD()) 
+			$kodeuk = apbd_getuseruk();
+		else {
+			$kodeuk = $_SESSION["kas_kodeuk"];
+			if ($kodeuk=='') $kodeuk = 'ZZ';
+		}
+		//$bulan = date('m');
+		$bulan = $_SESSION["kas_bulan"];
+		
+		drupal_set_message($bulan);
+		if ($bulan=='') $bulan = '0';
+		
+		$jenisdokumen = $_SESSION["kas_jenisdokumen"];
+		if ($jenisdokumen=='') $jenisdokumen = 'ZZ';
+		
+		$statusjurnal = $_SESSION["kas_statusjurnal"];
+			if ($statusjurnal=='') $statusjurnal = '0';
+		
+		$keyword = $_SESSION["kas_keyword"];
+
+	}
+	
+	if ($keyword == '') $keyword = 'ZZ';
+	
+	
+	//drupal_set_message(apbd_getkodejurnal('90'));
+	if (isUserSKPD()) {
+		$jurnalsuffix = 'uk';
+		$lblstatus = 'Pusat';
+		$isskpd = 1;
+	} else {
+		$jurnalsuffix = '';		//$bulan = date('m');	
+		$lblstatus = 'Dinas';
+		$isskpd = 0;
+	}
+		
+	//drupal_set_message($isskpd);
+	db_set_active('penatausahaan');
+	
+	$output_form = drupal_get_form('kaskeluarantrian_main_form');
+	$header = array (
+		array('data' => 'No','width' => '10px', 'valign'=>'top'),
+		array('data' => '', 'width' => '10px', 'valign'=>'top'),
+		array('data' => 'SKPD', 'field'=> 'kodeuk', 'valign'=>'top'),
+		array('data' => 'No. SP2D','width' => '80px','field'=> 'sp2dno', 'valign'=>'top'),
+		array('data' => 'Tgl. SP2D', 'width' => '90px','field'=> 'sp2dtgl', 'valign'=>'top'),
+		array('data' => 'Kegiatan', 'field'=> 'kegiatan', 'valign'=>'top'),
+		array('data' => 'Keperluan', 'field'=> 'keperluan', 'valign'=>'top'),
+		array('data' => 'Jumlah', 'width' => '80px', 'field'=> 'jumlah',  'valign'=>'top'),
+		array('data' => $lblstatus, 'width' => '40px',  'valign'=>'top'),
+		array('data' => '', 'width' => '50px', 'valign'=>'top'),
+		array('data' => '', 'width' => '50px', 'valign'=>'top'),
+		
+	);
+
+
+	
+	
+	
+	$query = db_select('dokumen', 'k')->extend('PagerDefault')->extend('TableSort');
+	$query->innerJoin('unitkerja', 'u', 'k.kodeuk=u.kodeuk');
+	$query->leftJoin('kegiatanskpd', 'keg', 'k.kodekeg=keg.kodekeg');
+
+	# get the desired fields from the database
+	$query->fields('k', array('dokid', 'jurnalidkas', 'jurnalidkasuk', 'kodeuk', 'sp2dno', 'sp2dtgl', 'jurnalkassudahuk','jurnalkassudah','keperluan', 'jumlah'));
+	$query->fields('u', array('namasingkat'));
+	$query->fields('keg', array('kegiatan'));
+	
+	//keyword
+	if ($keyword!='ZZ') {
+		$db_or = db_or();
+		$db_or->condition('k.kegiatan', '%' . db_like($keyword) . '%', 'LIKE');
+		$db_or->condition('k.keperluan', '%' . db_like($keyword) . '%', 'LIKE');	
+		$query->condition($db_or);	
+	}
+	
+	if ($kodeuk !='ZZ') $query->condition('k.kodeuk', $kodeuk, '=');
+	
+	
+	if ($kodeuk =='ZZ') {
+		global $user;
+		$username = $user->name;		
+		
+		$query->innerJoin('userskpdakt', 'us', 'k.kodeuk=us.kodeuk');
+		$query->condition('us.username', $username, '=');
+	
+	} else {
+		$query->condition('k.kodeuk', $kodeuk, '=');
+	}	
+	
+	
+	if ($bulan !='0') $query->condition('k.bulan', $bulan, '=');
+	if ($jenisdokumen =='ZZ') {
+		$query->condition('k.jenisdokumen', array(0, 1, 2), 'IN');
+	} else {
+		$query->condition('k.jenisdokumen', $jenisdokumen, '=');
+	}
+	
+	$query->condition('k.sp2dok', 1, '=');
+	
+	if ($isskpd==1) {
+		if ($statusjurnal !='ZZ') $query->condition('k.jurnalkassudahuk', $statusjurnal, '=');
+	} else {
+		if ($statusjurnal !='ZZ') $query->condition('k.jurnalkassudah', $statusjurnal, '=');
+	}
+	
+	$query->orderByHeader($header);
+	$query->orderBy('k.sp2dtgl', 'ASC');
+	$query->limit($limit);
+		
+	//dpq($query);
+	
+	# execute the query
+	$results = $query->execute();
+		
+	# build the table fields
+	$no=0;
+
+	if (isset($_GET['page'])) {
+		$page = $_GET['page'];
+		$no = $page * $limit;
+	} else {
+		$no = 0;
+	} 
+
+	$rows = array();
+	foreach ($results as $data) {
+		$no++;  
+		
+		
+		if ($isskpd ) {
+			if($data->jurnalkassudahuk=='1'){
+				$jurnalsudah = apbd_icon_jurnal_sudah();
+				$editlink = apbd_button_jurnal('kaskeluarjurnal/jurnaledit/' . $data->jurnalidkasuk);
+			
+			} else {
+				$jurnalsudah = apbd_icon_jurnal_belum();
+				$editlink = apbd_button_jurnalkan('kaskeluarantrian/jurnal/' . $data->dokid);
+			}
+
+			if ($data->jurnalkassudah == '1') {
+				$status = 'Sudah';
+				$style = 'green';
+				
+			} else {
+				$status = 'Belum';
+				$style = 'red';
+			}
+			
+		} else {
+			if($data->jurnalkassudah=='1'){
+				$jurnalsudah = apbd_icon_jurnal_sudah();
+				$editlink = apbd_button_jurnal('kaskeluarjurnal/jurnaledit/' . $data->jurnalidkas);
+			
+			} else {
+				$jurnalsudah = apbd_icon_jurnal_belum();
+				$editlink = apbd_button_jurnalkan('kaskeluarantrian/jurnal/' . $data->dokid);
+			}
+
+			if ($data->jurnalkassudahuk == '1') {
+				$status = 'Sudah';
+				$style = 'green';
+				
+			} else {
+				$status = 'Belum';
+				$style = 'red';
+			}
+			
+		}
+		
+		$kegiatan = ($data->kegiatan==''? 'Non Kegiatan':$data->kegiatan);
+		
+		$rows[] = array(
+						array('data' => $no, 'align' => 'right', 'valign'=>'top'),
+						array('data' => $jurnalsudah,'align' => 'right', 'valign'=>'top'),
+						array('data' => $data->namasingkat,  'align' => 'left', 'valign'=>'top'),
+						array('data' => $data->sp2dno, 'align' => 'left', 'valign'=>'top'),
+						array('data' => apbd_format_tanggal_pendek($data->sp2dtgl),  'align' => 'center', 'valign'=>'top'),
+						array('data' => $kegiatan, 'align' => 'left', 'valign'=>'top'),
+						array('data' => $data->keperluan, 'align' => 'left', 'valign'=>'top'),
+						array('data' => apbd_fn($data->jumlah),'align' => 'right', 'valign'=>'top'),
+						array('data' => $status,'align' => 'center', 'valign'=>'top', 'style'=>'color: ' . $style),
+						$editlink,
+						apbd_button_esp2d($data->dokid),
+						//"<a href=\'?q=jurnal/edit/'>" . 'Register' . '</a>',
+						
+					);
+	}
+	
+	db_set_active();
+	
+	
+	
+	$output = theme('table', array('header' => $header, 'rows' => $rows ));
+	$output .= theme('pager');
+
+	return drupal_render($output_form) . $output;
+	
+}
+
+
+function kaskeluarantrian_main_form_submit($form, &$form_state) {
+	
+	$kodeuk = $form_state['values']['kodeuk'];
+	
+	if($form_state['clicked_button']['#value'] == $form_state['values']['submit']) {
+		$bulan = $form_state['values']['bulan'];
+		$jenisdokumen = $form_state['values']['jenisdokumen'];
+		$statusjurnal = $form_state['values']['statusjurnal'];
+		$keyword = $form_state['values']['keyword'];
+
+	} else {
+		$bulan = '0';
+		$jenisdokumen = 'ZZ';
+		$statusjurnal = '0';
+		$keyword = '';
+	
+	}	
+	
+	$_SESSION["kas_kodeuk"] = $kodeuk;
+	$_SESSION["kas_bulan"] = $bulan;
+	$_SESSION["kas_jenisdokumen"] = $jenisdokumen;
+	$_SESSION["kas_statusjurnal"] = $statusjurnal;
+	$_SESSION["kas_keyword"] = $keyword;
+	
+	$uri = 'kaskeluarantrian/filter/' . $kodeuk . '/' . $bulan . '/' . $jenisdokumen . '/' . $statusjurnal . '/' . $keyword;
+	drupal_goto($uri);
+	
+}
+
+
+function kaskeluarantrian_main_form($form, &$form_state) {
+	
+	if(arg(2)!=null){
+		
+		$kodeuk = arg(2);
+		$bulan=arg(3);
+		$jenisdokumen = arg(4);
+		$statusjurnal = arg(5);
+		$keyword = arg(6);
+
+		} else {
+		if (isUserSKPD()) 
+			$kodeuk = apbd_getuseruk();
+		else {
+			$kodeuk = $_SESSION["kas_kodeuk"];
+			if ($kodeuk=='') $kodeuk = 'ZZ';
+		}
+		//$bulan = date('m');
+		$bulan = $_SESSION["kas_bulan"];
+		if ($bulan=='') $bulan = '0';
+		
+		$jenisdokumen = $_SESSION["kas_jenisdokumen"];
+		if ($jenisdokumen=='') $jenisdokumen = 'ZZ';
+		
+		$statusjurnal = $_SESSION["kas_statusjurnal"];
+			if ($statusjurnal=='') $statusjurnal = 'ZZ';
+		
+		$keyword = $_SESSION["kas_keyword"];
+		//if ($keyword=='') $keyword = 'ZZ';
+/*
+		$jenisgaji = $_SESSION["sp2d_gaji_jenisgaji"];
+		if ($jenisgaji=='') $jenisgaji = 'ZZ';
+		*/
+	}
+ 
+	$form['formdata'] = array (
+		'#type' => 'fieldset',
+		'#title'=>  'PILIHAN DATA',
+		//'#title'=>  '<p>PILIHAN DATA</p>' . '<em><small class="text-info pull-right">klik disini utk menampilkan/menyembunyikan pilihan data</small></em>',
+		//'#attributes' => array('class' => array('container-inline')),
+		'#collapsible' => TRUE,
+		'#collapsed' => TRUE,        
+	);		
+	
+	if (isUserSKPD()) {
+		$form['formdata']['kodeuk'] = array(
+			'#type' => 'value',
+			'#value' => $kodeuk,
+		);
+		
+	} else {
+
+		global $user;
+		$username = $user->name;		
+	
+		$option_skpd['ZZ'] = 'SELURUH SKPD';	
+		
+		$result = db_query('SELECT unitkerja.kodeuk, unitkerja.namasingkat FROM unitkerja INNER JOIN userskpd ON unitkerja.kodeuk=userskpd.kodeuk WHERE userskpd.username=:username ORDER BY unitkerja.namasingkat', array(':username' => $username));	
+		while($row = $result->fetchObject()){
+			$option_skpd[$row->kodeuk] = $row->namasingkat; 
+		}
+		 
+		$form['formdata']['kodeuk'] = array(
+			'#type' => 'select',
+			'#title' =>  t('SKPD'),
+			// The entire enclosing div created here gets replaced when dropdown_first
+			// is changed.
+			'#prefix' => '<div id="skpd-replace">',
+			'#suffix' => '</div>',
+			// When the form is rebuilt during ajax processing, the $selected variable
+			// will now have the new value and so the options will change.
+			'#options' => $option_skpd,
+			//'#default_value' => isset($form_state['values']['skpd']) ? $form_state['values']['skpd'] : $kodeuk,
+			'#default_value' => $kodeuk,
+		);
+	}	
+	
+	//BULAN
+	$option_bulan =array('Setahun', 'Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember');
+	$form['formdata']['bulan'] = array(
+		'#type' => 'select',
+		'#title' =>  t('Bulan'),
+		// The entire enclosing div created here gets replaced when dropdown_first
+		// is changed.
+		'#options' => $option_bulan,
+		//'#default_value' => isset($form_state['values']['skpd']) ? $form_state['values']['skpd'] : $kodeuk,
+		'#default_value' =>$bulan,
+	);
+
+	//JENIS DOKUMEN
+	$opt_jenisdokumen['ZZ'] ='SEMUA';
+	$opt_jenisdokumen['0'] = 'UP - UANG PERSEDIAAN';
+	$opt_jenisdokumen['1'] = 'GU - GANTI UANG';
+	$opt_jenisdokumen['2'] = 'TU - TAMBAHAN UANG';	
+	$form['formdata']['jenisdokumen'] = array(
+		'#type' => 'select',
+		'#title' =>  t('Dokumen'),
+		'#options' => $opt_jenisdokumen,
+		//'#default_value' => isset($form_state['values']['skpd']) ? $form_state['values']['skpd'] : $kodeuk,
+		'#default_value' => $jenisdokumen,
+	);	
+	
+	$opt_jurnal['ZZ'] ='SEMUA';
+	$opt_jurnal['0'] = 'BELUM JURNAL';
+	$opt_jurnal['1'] = 'SUDAH JURNAL';	
+	$form['formdata']['statusjurnal'] = array(
+		'#type' => 'select',
+		'#title' =>  t('Penjurnalan'),
+		'#options' => $opt_jurnal,
+		//'#default_value' => isset($form_state['values']['skpd']) ? $form_state['values']['skpd'] : $kodeuk,
+		//'#attributes' => array('class' => array('container-inline')), 
+		//'#prefix' => '<div class="container-inline">', 
+		//'#suffix' => '</div>',		
+		'#default_value' => $statusjurnal,
+	);	 
+	$form['formdata']['keyword'] = array(
+		'#type' => 'textfield',
+		'#title' =>  t('Kata Kunci'),
+		'#description' =>  t('Kata kunci untuk mencari S2PD, bisa nama kegiatan, keperluan, atau nama penerima/pihak ketiga'),
+		'#default_value' => $keyword, 
+	);	
+	
+	//align-justify
+	$form['formdata']['submit']= array(
+		'#type' => 'submit',
+		'#value' => '<span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span> Tampilkan',
+		'#attributes' => array('class' => array('btn btn-success btn-sm')),
+	);
+	$form['formdata']['reset']= array(
+		'#type' => 'submit',
+		'#value' => '<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Reset',
+		'#attributes' => array('class' => array('btn btn-success btn-sm')),
+	);	
+	return $form;
+}
+
+
+
+?>

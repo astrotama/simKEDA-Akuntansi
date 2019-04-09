@@ -1,0 +1,44 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_perm().
+ */
+//onModuleCreationWizard
+function jurnal_item_perm() {
+    return array(
+        'access jurnal_item content',
+		'access laporan jurnal_item'
+	);
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+
+function jurnal_item_menu() {
+
+	$items['jurnal_item'] = array (
+      'title' => 'JURNAL ITEM',
+	  'description' => 'JURNAL ITEM',
+      'page callback' => 'jurnal_item_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'jurnal_item_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+	$items['jurnal_item/tambah'] = array (
+      'title' => 'TAMBAH JURNAL ITEM',
+	  'description' => 'TAMBAH JURNAL ITEM',
+      'page callback' => 'tambah_jurnal_item_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'tambah_jurnal_item_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+    return $items;
+}

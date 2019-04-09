@@ -1,0 +1,89 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_perm().
+ */
+//onModuleCreationWizard
+function kaskeluar_perm() {
+    return array(
+        'access penata content',
+		'access laporan penata'
+	);
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+
+function kaskeluar_menu() {
+
+	$items['kaskeluarantrian'] = array (
+      'title' => 'Antrian Jurnal Kas Keluar',
+	  'description' => 'Antrian Jurnal Kas Keluar',
+	  'title callback' => 'kaskeluarantrian_title_callback',	  
+      'page callback' => 'kaskeluarantrian_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'kaskeluarantrian_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['kaskeluarantrian/jurnal'] = array (
+      'title' => 'Jurnal Kas Keluar',
+	  'description' => 'Jurnal Kas Keluar',
+	  'title callback' => 'kaskeluarjurnal_title_callback',	  
+      'page callback' => 'kaskeluarjurnal_post_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'kaskeluarjurnal_post_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['kaskeluarjurnal/jurnaledit'] = array (
+      'title' => 'Jurnal Kas Keluar',
+	  'description' => 'Jurnal Kas Keluar',
+	  'title callback' => 'kaskeluarjurnal_title_callback',	  
+      'page callback' => 'kaskeluarjurnal_edit_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'kaskeluarjurnal_edit_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['kaskeluarjurnal'] = array (
+      'title' => 'Daftar Jurnal Kas Keluar',
+	  'description' => 'Daftar Jurnal Kas Keluar',
+	  'title callback' => 'kaskeluarjurnal_title_callback',	  
+      'page callback' => 'kaskeluarjurnal_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'kaskeluarjurnal_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+
+	$items['kaskeluarbatch'] = array (
+      'title' => 'Jurnal Pengeluaran Kas Daerah',
+	  'description' => 'Jurnal Pengeluaran Kas Daerah',
+	  //'title callback' => 'jurnalspjantrian_title_callback',	  
+      'page callback' => 'kaskeluarbatch_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'kaskeluarbatch_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+    return $items;
+}
+
+
+function kaskeluarantrian_title_callback() {
+    return t('Antrian Jurnal Kas Keluar');
+}
+
+function kaskeluarjurnal_title_callback() {
+	return t('Jurnal Kas Keluar');
+}
+
