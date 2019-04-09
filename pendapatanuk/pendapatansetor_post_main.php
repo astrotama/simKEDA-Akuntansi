@@ -1,0 +1,243 @@
+<?php
+function pendapatansetor_post_main($arg=NULL, $nama=NULL) {
+	
+	$setorid = arg(2);	
+	if(arg(3)=='pdf'){			  
+		$output = getTable($tahun,$setorid);
+		print_pdf_p($output);
+	
+	} else {
+	
+		$btn = l('Cetak', 'pendapatan/edit/' . $setorid . '/pdf' , array ('html' => true, 'attributes'=> array ('class'=>'btn btn-primary')));
+		//$btn .= "&nbsp;" . l('Excel', '' , array ('html' => true, 'attributes'=> array ('class'=>'btn btn-primary')));
+		
+		//$output = theme('table', array('header' => $header, 'rows' => $rows ));
+		//$output .= theme('table', array('header' => $header, 'rows' => $rows ));
+		//$output .= theme('pager');
+		$output_form = drupal_get_form('pendapatansetor_post_main_form');
+		return drupal_render($output_form);// . $output;
+	}		
+	
+}
+
+function getTable($tahun,$setorid){
+
+}
+
+function pendapatansetor_post_main_form($form, &$form_state) {
+	
+	$idkeluar = arg(2);
+	
+	db_set_active('pendapatan');
+	$query = db_select('q_antriansetorkeluar', 'q');
+	$query->fields('q', array('id', 'kodeuk', 'tgl_keluar', 'keterangan', 'jumlah'));
+	
+	//$query->fields('u', array('namasingkat'));
+	$query->condition('q.id', $idkeluar, '=');
+	
+	//dpq($query);
+	
+	# execute the query
+	$results = $query->execute();
+	foreach ($results as $data) {
+		
+		$title = 'Nomor ' . $data->id . ', ' . apbd_format_tanggal_pendek($data->tgl_keluar);
+		
+		//$rekening = $data->kodero . ', ' . $data->uraian;
+		
+		$keterangan = $data->keterangan;
+		$kodeuk = $data->kodeuk;
+		
+		
+		$refno = $data->id; 
+		$tanggal= strtotime($data->tgl_keluar);		
+		$nobukti = '';
+		$jumlah = $data->jumlah;
+		
+	}
+	
+	//detil
+	$rekening= ''; $ketdetil = '';
+	$results = db_query('select s.kodero, r.uraian namarekening, s.uraian, s.jumlahmasuk from setor s inner join rincianobyek r on s.kodero=r.kodero where s.idkeluar=:idkeluar', array(':idkeluar'=>$idkeluar));	
+	foreach ($results as $data) {
+		$ketdetil .= $data->kodero . ' - ' . $data->namarekening . ', ' . $data->uraian . ' ' . apbd_fn($data->jumlahmasuk) . '; ';
+		$rekening .= $data->kodero . ' - ' . $data->namarekening . '; ';
+	}	
+	$keterangan = $keterangan . ', ' . $ketdetil;
+	
+	db_set_active();
+	
+	drupal_set_title($title);
+	
+
+	$form['setorid'] = array(
+		'#type' => 'value',
+		'#value' => $idkeluar,
+	);	
+
+	$form['tanggal'] = array(
+		'#type' => 'date',
+		'#title' =>  t('Tanggal'),
+		// The entire enclosing div created here gets replaced when dropdown_first
+		// is changed.
+		//'#disabled' => true,
+		'#default_value' => $tanggal,
+		'#default_value'=> array(
+			'year' => format_date($tanggal, 'custom', 'Y'),
+			'month' => format_date($tanggal, 'custom', 'n'), 
+			'day' => format_date($tanggal, 'custom', 'j'), 
+		  ), 
+		
+	);
+
+	//SKPD
+	$form['kodeuk'] = array(
+		'#type' => 'hidden',
+		'#default_value' => $kodeuk,
+	);
+	
+	$form['nobukti'] = array(
+		'#type' => 'textfield',
+		'#title' =>  t('No Bukti'),
+		// The entire enclosing div created here gets replaced when dropdown_first
+		// is changed.
+		//'#disabled' => true,
+		'#default_value' => $refno,
+	);
+	$form['nobuktilain'] = array(
+		'#type' => 'textfield',
+		'#title' =>  t('No Bukti Lain'),
+		// The entire enclosing div created here gets replaced when dropdown_first
+		// is changed.
+		//'#disabled' => true,
+		'#default_value' => $nobukti,
+	);
+	$form['keterangan'] = array(
+		'#type' => 'textarea',
+		'#title' =>  t('Keterangan'),
+		// The entire enclosing div created here gets replaced when dropdown_first
+		// is changed.
+		//'#disabled' => true,
+		'#default_value' => $keterangan,
+	);
+
+
+	$form['rekening'] = array(
+		'#type' => 'item',
+		'#title' =>  t('Rekening'),
+		// The entire enclosing div created here gets replaced when dropdown_first
+		// is changed.
+		//'#disabled' => true,
+		'#markup' => '<p>' . $rekening . '</p>',
+	);	
+
+	$form['jumlah']= array(
+		'#type' => 'textfield',
+		'#title' => 'Jumlah',
+		'#attributes'	=> array('style' => 'text-align: right'),
+		//'#disabled' => true,
+		'#default_value' => $jumlah,
+	);
+
+	$form['formdata']['submit']= array(
+		'#type' => 'submit',
+		//'#value' => 'Simpan',
+		//'#attributes' => array('class' => array('btn btn-success')),
+		'#value' => '<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Simpan',
+		'#attributes' => array('class' => array('btn btn-success btn-sm')),
+		
+	);
+
+	return $form;
+}
+
+function pendapatansetor_post_main_form_submit($form, &$form_state) {
+	$kodeuk = $form_state['values']['kodeuk'];
+	$setorid = $form_state['values']['setorid'];
+	
+	$nobukti = $form_state['values']['nobukti'];
+	$nobuktilain = $form_state['values']['nobuktilain'];
+	$keterangan = $form_state['values']['keterangan'];
+	$jumlah = $form_state['values']['jumlah'];
+	
+	$tanggal = $form_state['values']['tanggal'];
+	$tanggalsql = $tanggal['year'] . '-' . $tanggal['month'] . '-' . $tanggal['day'];
+	
+
+	//BEGIN TRANSACTION
+	//$transaction = db_transaction();
+	
+	//try {
+		//JURNAL
+		$jurnalid = apbd_getkodejurnal_uk($kodeuk);
+		//drupal_set_message($jurnalid);
+		$query = db_insert('jurnaluk')
+				->fields(array('jurnalid', 'refid', 'kodeuk', 'jenis', 'nobukti', 'nobuktilain', 'tanggal', 'keterangan', 'total'))
+				->values(
+					array(
+						'jurnalid'=> $jurnalid,
+						'refid' => $setorid,
+						'kodeuk' => $kodeuk,
+						'jenis' => 'pad-out',
+						'nobukti' => $nobukti,
+						'nobuktilain' => $nobuktilain,
+						'tanggal' =>$tanggalsql,
+						'keterangan' => $keterangan, 
+						'total' => $jumlah,
+					)
+				);
+		//drupal_set_message($query);		
+		$res = $query->execute();
+
+		//JURNAL ITEM APBD
+		//1
+		$query = db_insert('jurnalitemuk')
+				->fields(array('jurnalid', 'nomor', 'kodero', 'debet'))
+				->values(
+					array(
+						'jurnalid' => $jurnalid,
+						'nomor' => 1,
+						'kodero' => apbd_getKodeROAPBD(), //'11103001',
+						'debet' => $jumlah,
+					)
+				); 
+		$res = $query->execute();
+		//2. 
+		$query = db_insert('jurnalitemuk')
+				->fields(array('jurnalid', 'nomor', 'kodero', 'kredit'))
+				->values(
+					array(
+						'jurnalid'=> $jurnalid,
+						'nomor' => 2,
+						'kodero' => '11103001',
+						'kredit' => $jumlah,
+					)
+				);
+		$res = $query->execute();
+		
+		 
+		
+		//PBP
+		db_set_active('pendapatan');
+		$query = db_update('setoridmaster')
+		->fields(
+				array(
+					'jurnalsudah' => 1,
+					'jurnalid' => $jurnalid,
+				)
+			);
+		$query->condition('id', $setorid, '=');
+		$res = $query->execute();
+		db_set_active();
+
+	//}
+	//	catch (Exception $e) {
+	//	$transaction->rollback();
+	//	watchdog_exception('jurnal-pendapatan-' . $setorid, $e);
+	//}		
+	//if ($res) drupal_goto('pendapatanantrian');
+	drupal_goto('pendapatansetor');
+}
+
+
+?>

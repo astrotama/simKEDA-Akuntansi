@@ -1,0 +1,138 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_perm().
+ */
+//onModuleCreationWizard
+function pendapatanpusat_permission() {
+  return array(
+    'jurnal pendapatan pusat' => array(
+      'title' => t('Jurnal Pendapatan Pusat'),
+      'description' => t('Jurnal Pendapatan Pusat.'),
+    ),
+  );
+}
+
+
+function pendapatanpusat_menu() {
+
+	$items['pendapatanantrian'] = array (
+      'title' => 'Antrian Jurnal Pendapatan',
+	  'description' => 'Antrian Jurnal Pendapatan',
+	  //'title callback' => 'pendapatanantrian_title_callback',	  
+      'page callback' => 'pendapatanantrian_main',
+      'access arguments' => array ('jurnal pendapatan pusat'),
+	  //'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'pendapatanantrian_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['pendapatanantrian/jurnal'] = array (
+      'title' => 'Jurnal Pendapatan',
+	  'description' => 'Jurnal Pendapatan',
+	  //'title callback' => 'pendapatanjurnal_title_callback',	  
+      'page callback' => 'pendapatanjurnal_post_main',
+      'access arguments' => array ('jurnal pendapatan pusat'),
+	  //'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'pendapatanjurnal_post_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['pendapatanjurnal/jurnaledit'] = array (
+      'title' => 'Jurnal Pendapatan',
+	  'description' => 'Jurnal Pendapatan',
+	  //'title callback' => 'pendapatanjurnal_title_callback',	  
+      'page callback' => 'pendapatanjurnal_edit_main',
+      'access arguments' => array ('jurnal pendapatan pusat'),
+	  //'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'pendapatanjurnal_edit_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+    $items['pendapatanjurnal/delete'] = array (
+      'title' => 'Hapus Jurnal Pendapatan',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('pendapatanjurnal_delete_form'),
+      'access arguments' => array ('jurnal pendapatan pusat'),
+	  //'access callback' => 'user_is_logged_in',
+      'file' => 'pendapatanjurnal_delete_form.php',
+      'type' => MENU_CALLBACK,
+    );		
+    $items['pendapatanantrian/deleteant'] = array (
+      'title' => 'Hapus Jurnal Pendapatan',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('pendapatanjurnal_deleteant_form'),
+      'access arguments' => array ('jurnal pendapatan pusat'),
+	  //'access callback' => 'user_is_logged_in',
+      'file' => 'pendapatanjurnal_deleteant_form.php',
+      'type' => MENU_CALLBACK,
+    );	
+    $items['pendapatanjurnal/deleteday'] = array (
+      'title' => 'Hapus Jurnal Pendapatan',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('pendapatanjurnal_deleteday_form'),
+      'access arguments' => array ('jurnal pendapatan pusat'),
+	  //'access callback' => 'user_is_logged_in',
+      'file' => 'pendapatanjurnal_deleteday_form.php',
+      'type' => MENU_CALLBACK,
+    );		
+	$items['pendapatanjurnal'] = array (
+      'title' => 'Daftar Jurnal Pendapatan',
+	  'description' => 'Daftar Jurnal Pendapatan',
+	  //'title callback' => 'pendapatanjurnal_title_callback',	  
+      'page callback' => 'pendapatanjurnal_main',
+      'access arguments' => array ('jurnal pendapatan pusat'),
+	  //'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'pendapatanjurnal_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+	$items['pendapatanjurnalman'] = array (
+      'title' => 'Jurnal Pendapatan | Baru',
+	  'description' => 'Jurnal Pendapatan | Baru',
+	  ////'title callback' => 'pendapatanjurnal_title_callback',	  
+      'page callback' => 'pendapatanman_post_main',
+      'access arguments' => array ('jurnal pendapatan pusat'),
+	  //'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'pendapatanman_post_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['pendapatanjurnalmanuk'] = array (
+      'title' => 'Jurnal Pendapatan | Baru',
+	  'description' => 'Jurnal Pendapatan | Baru',
+	  ////'title callback' => 'pendapatanjurnal_title_callback',	  
+      'page callback' => 'pendapatanmanuk_post_main',
+      'access arguments' => array ('jurnal pendapatan pusat'),
+	  'access callback' => 'user_is_logged_in',
+	  'weight' => 11,
+      'file' => 'pendapatanmanuk_post_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+    $items['pendapatanimportbank'] = array (
+		'title' => 'Import Data dari Bank',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('pendapatan_import_form'),
+		'access arguments' => array ('jurnal pendapatan pusat'),
+		//'access arguments' => array ('access content'),
+		'file' => 'pendapatan_import_form.php',
+		'type' => MENU_CALLBACK,
+    );	
+
+    $items['pendapatanimportbku'] = array (
+		'title' => 'Import BKU dari Bank',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('pendapatanbku_import_form'),
+		'access arguments' => array ('jurnal pendapatan pusat'),
+		//'access arguments' => array ('access content'),
+		'file' => 'pendapatanbku_import_form.php',
+		'type' => MENU_CALLBACK,
+    );	
+	
+    return $items;
+}
+
+

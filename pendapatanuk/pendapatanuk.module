@@ -1,0 +1,168 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_perm().
+ */
+//onModuleCreationWizard
+function pendapatanuk_permission() {
+  return array(
+    'jurnal pendapatan skpd' => array(
+      'title' => t('Jurnal Pendapatan SKPD'),
+      'description' => t('Jurnal Pendapatan SKPD.'),
+    ),
+  );
+}
+
+
+function pendapatanuk_menu() {
+
+
+	//SKPD
+	$items['pendapatanjurnaluk'] = array (
+      'title' => 'Arsip Jurnal Pendapatan',
+	  'description' => 'Arsip Jurnal Pendapatan',
+	  //'title callback' => 'pendapatanjurnal_title_callback',	  
+      'page callback' => 'pendapatanjurnaluk_main',
+      'access arguments' => array ('jurnal pendapatan skpd'),
+	  //'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'pendapatanjurnaluk_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+	$items['pendapatanmasuk'] = array (
+      'title' => 'Antrian Jurnal Pendapatan',
+	  'description' => 'Antrian Jurnal Pendapatan',
+      'page callback' => 'pendapatanmasuk_main',
+      //'access arguments' => array ('jurnal pendapatan skpd'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'pendapatanmasuk_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+	$items['pendapatanmasukbatch'] = array (
+      'title' => 'Jurnal Penerimaan Pendapatan Batch',
+	  'description' => 'Jurnal Penerimaan Pendapatan Batch',
+      'page callback' => 'pendapatanmasuk_batch_main',
+      //'access arguments' => array ('jurnal pendapatan skpd'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'pendapatanmasuk_batch_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	    
+	$items['pendapatanmasuk/jurnal'] = array (
+      'title' => 'Jurnal Pendapatan',
+	  'description' => 'Jurnal Pendapatan',
+      'page callback' => 'pendapatanmasuk_post_main',
+      'access arguments' => array ('jurnal pendapatan skpd'),
+	  //'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'pendapatanmasuk_post_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+	$items['pendapatanmasuk/edit'] = array (
+      'title' => 'Jurnal Pendapatan',
+	  'description' => 'Jurnal Pendapatan',
+      'page callback' => 'pendapatanmasuk_edit_main',
+      'access arguments' => array ('jurnal pendapatan skpd'),
+	  //'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'pendapatanmasuk_edit_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+    $items['pendapatanmasuk/delete'] = array (
+      'title' => 'Hapus Jurnal Pendapatan',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('pendapatanmasuk_delete_form'),
+      'access arguments' => array ('jurnal pendapatan skpd'),
+	  //'access callback' => 'user_is_logged_in',
+      'file' => 'pendapatanmasuk_delete_form.php',
+      'type' => MENU_CALLBACK,
+    );
+
+	$items['pendapatanjurnaluksetor'] = array (
+      'title' => 'Arsip Jurnal Penyetoran',
+	  'description' => 'Arsip Jurnal Penyetoran',
+	  //'title callback' => 'pendapatanjurnal_title_callback',	  
+      'page callback' => 'pendapatanjurnaluksetor_main',
+      'access arguments' => array ('jurnal pendapatan skpd'),
+	  //'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'pendapatanjurnaluksetor_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['pendapatansetor'] = array (
+      'title' => 'Antrian Jurnal Setoran',
+	  'description' => 'Antrian Jurnal Setoran',
+      'page callback' => 'pendapatansetor_main',
+      'access arguments' => array ('jurnal pendapatan skpd'),
+	  //'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'pendapatansetor_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+	$items['pendapatansetorbatch'] = array (
+      'title' => 'Jurnal Penyetoran Pendapatan Batch',
+	  'description' => 'Jurnal Penyetoran Pendapatan Batch',
+      'page callback' => 'pendapatansetor_batch_main',
+      //'access arguments' => array ('jurnal pendapatan skpd'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'pendapatansetor_batch_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );    
+	$items['pendapatansetor/jurnal'] = array (
+      'title' => 'Jurnal Setoran',
+	  'description' => 'Jurnal Setoran',
+      'page callback' => 'pendapatansetor_post_main',
+      'access arguments' => array ('jurnal pendapatan skpd'),
+	  //'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'pendapatansetor_post_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );		
+	$items['pendapatansetor/edit'] = array (
+      'title' => 'Jurnal Setoran',
+	  'description' => 'Jurnal Pendapatan',
+      'page callback' => 'pendapatansetor_edit_main',
+      'access arguments' => array ('jurnal pendapatan skpd'),
+	  //'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'pendapatansetor_edit_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );		
+    return $items;
+}
+
+function pendapatanuk_get_antrian_penerimaan() {
+	$kodeuk = apbd_getuseruk();
+	$x = 0;
+	db_set_active('pendapatan');
+	
+	$res = db_query('select count(setorid) as jumlah from setor where jurnalsudah=0 and kodeuk=:kodeuk', array(':kodeuk'=>$kodeuk));
+	foreach ($res as $dat) {
+		$x = $dat->jumlah;
+		//drupal_set_message($dat->jumlah);
+	}		
+		
+	db_set_active();
+	
+	return $x;
+}
+
+function pendapatanuk_get_antrian_penyetoran() {
+	$kodeuk = apbd_getuseruk();
+	$x = 0;
+	db_set_active('pendapatan');
+	
+	//$res = db_query('select count(m.id) as jumlah from setoridmaster m inner join setor s on m.id=s.idkeluar where m.jurnalsudah=0 and m.kodeuk=:kodeuk', array(':kodeuk'=>$kodeuk));
+	$res = db_query('select count(id) as jumlah from setoridmaster where jurnalsudah=0 and kodeuk=:kodeuk', array(':kodeuk'=>$kodeuk));
+	foreach ($res as $dat) {
+		$x = $dat->jumlah;
+		//drupal_set_message($dat->jumlah);
+	}		
+		
+	db_set_active();
+	
+	return $x;
+}
